@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword Extractor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        #fileUpload {
+            display: none;
+        }
+
+        .upload-btn {
+            background: #1a73e8;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .upload-btn:hover {
+            background: #1557b0;
+        }
+
+        #textInput {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        #resultsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        #resultsTable th {
+            background: #1a73e8;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #resultsTable td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #resultsTable tr:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Keyword Analyzer</h1>
+        
+        <div class="input-section">
+            <label class="upload-btn">
+                📁 Upload TXT File
+                <input type="file" id="fileUpload" accept=".txt">
+            </label>
+            <div style="flex-grow: 1"></div>
+        </div>
+
+        <textarea id="textInput" placeholder="Paste your text here or upload a file..."></textarea>
+
+        <button class="upload-btn" onclick="processText()" style="width: 100%; margin-top: 1rem">
+            🔍 Extract Keywords
+        </button>
+
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Keyword</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Handle file upload
+        document.getElementById('fileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                document.getElementById('textInput').value = e.target.result;
+            };
+            
+            reader.readAsText(file);
+        });
+
+        // Process text and display results
+        function processText() {
+            const text = document.getElementById('textInput').value.toLowerCase();
+            const words = text.match(/\b\w{4,}\b/g) || [];
+            const wordCount = {};
+
+            // Count word frequencies
+            words.forEach(word => {
+                wordCount[word] = (wordCount[word] || 0) + 1;
+            });
+
+            // Sort by frequency
+            const sortedWords = Object.entries(wordCount).sort((a, b) => b[1] - a[1]);
+
+            // Display results
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+            
+            sortedWords.forEach(([word, count]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${word}</td><td>${count}</td>`;
+                resultsBody.appendChild(row);
+            });
+
+            document.getElementById('resultsTable').style.display = 'table';
+        }
+    </script>
+</body>
+</html>
